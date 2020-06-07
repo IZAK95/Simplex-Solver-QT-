@@ -13,7 +13,7 @@ class Solver : public QGraphicsView
 public:
     Solver(QWidget *parent = nullptr);
 
-    void displayMainMenu();
+
 
 
     QGraphicsScene * scene;
@@ -25,5 +25,8 @@ public:
 public slots:
      void start();
      int Calculate();
+     void displayResults();
+     void displayMainMenu();
+
 };
 #endif // SOLVER_H

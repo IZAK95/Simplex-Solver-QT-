@@ -32,7 +32,7 @@ Solver::Solver(QWidget *parent)
 }
 
 void Solver::displayMainMenu()
-{
+{   scene->clear();
     // create title text
     QGraphicsTextItem *titleText = new QGraphicsTextItem(QString("Linear Solver"));
     QFont titleFont("comic sans", 50);
@@ -47,8 +47,33 @@ void Solver::displayMainMenu()
     int xPlayPos = this->width()/2 - calculateButton->boundingRect().width()/2 +800;
     int yPlayPos = 800;
     calculateButton->setPos(xPlayPos, yPlayPos);
-    connect(calculateButton, SIGNAL(clicked()), this, SLOT(Calculate()));
+    connect(calculateButton, SIGNAL(clicked()), this, SLOT(displayResults()));
     scene->addItem(calculateButton);
+}
+
+void Solver::displayResults()
+{
+    scene->clear();
+
+    Solver solution;
+    solution.Calculate();
+
+    // create title text
+    QGraphicsTextItem *titleText = new QGraphicsTextItem(QString("Results"));
+    QFont titleFont("comic sans", 50);
+    titleText->setFont(titleFont);
+    int xTitlePos = this->width()/2 - titleText->boundingRect().width()/2;
+    int yTitlePos = 150;
+    titleText->setPos(xTitlePos, yTitlePos);
+    scene->addItem(titleText);
+
+    // create Calulate button
+    Button *BackButton = new Button(QString("Back"));
+    int xPlayPos = this->width()/2 - BackButton->boundingRect().width()/2 ;
+    int yPlayPos = 800;
+    BackButton->setPos(xPlayPos, yPlayPos);
+    connect(BackButton, SIGNAL(clicked()), this, SLOT(displayMainMenu()));
+    scene->addItem(BackButton);
 }
 
 int Solver::Calculate()
@@ -103,14 +128,7 @@ void Solver::start()
 
 
 
-     result = new QGraphicsScene;
 
-     // set up screen
-     setFixedSize(sceneWidth, sceneHeight);
-     // set up scene
-     scene = new QGraphicsScene();
-     scene->setSceneRect(0, 0, sceneWidth, sceneHeight);
-     setScene(result);
 
 }
 
