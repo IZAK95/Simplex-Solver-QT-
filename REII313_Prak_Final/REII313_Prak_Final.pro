@@ -19,11 +19,13 @@ SOURCES += \
     button.cpp \
     input.cpp \
     main.cpp \
+    simplex.cpp \
     solver.cpp
 
 HEADERS += \
     button.h \
     input.h \
+    simplex.h \
     solver.h
 
 # Default rules for deployment.

@@ -13,4 +13,7 @@ int main(int argc, char *argv[])
     solver->show();
     solver->displayMainMenu();
     return a.exec();
+
+
+
 }
