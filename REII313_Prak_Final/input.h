@@ -14,6 +14,8 @@ public:
     explicit Input(QWidget *parent = nullptr);
     Input(QLabel name,QLineEdit edit);
 
+
+
 signals:
 
 };

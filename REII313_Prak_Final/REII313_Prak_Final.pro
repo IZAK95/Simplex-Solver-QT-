@@ -20,13 +20,15 @@ SOURCES += \
     input.cpp \
     main.cpp \
     simplex.cpp \
-    solver.cpp
+    solver.cpp \
+    spinbox.cpp
 
 HEADERS += \
     button.h \
     input.h \
     simplex.h \
-    solver.h
+    solver.h \
+    spinbox.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1,0 +1,10 @@
+debug/button.o
+debug/input.o
+debug/main.o
+debug/simplex.o
+debug/solver.o
+debug/spinbox.o
+debug/moc_button.o
+debug/moc_input.o
+debug/moc_solver.o
+debug/moc_spinbox.o

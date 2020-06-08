@@ -5,6 +5,18 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
+#include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDebug>
+#include <QMessageBox>
+#include <QComboBox>
+#include "button.h"
+#include <iostream>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QDebug>
+#include <QSpinBox>
 
 class Solver : public QGraphicsView
 {

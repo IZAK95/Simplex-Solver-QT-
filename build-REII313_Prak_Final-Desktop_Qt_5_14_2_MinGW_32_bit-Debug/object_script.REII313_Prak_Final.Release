@@ -1,0 +1,10 @@
+release/button.o
+release/input.o
+release/main.o
+release/simplex.o
+release/solver.o
+release/spinbox.o
+release/moc_button.o
+release/moc_input.o
+release/moc_solver.o
+release/moc_spinbox.o
