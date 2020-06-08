@@ -80,15 +80,15 @@ void Solver::displayResults()
 
 int Solver::Calculate()
 {
-    int colSizeA=10;  //should initialise columns size in A
-    int rowSizeA = 10;  //should initialise columns row in A[][] vector
+    int colSizeA=6;  //should initialise columns size in A
+    int rowSizeA = 3;  //should initialise columns row in A[][] vector
     float x = 5;
     float y = 10;
     float z = 8;
 
-    float C[]= {-x,-y,-z,0,0,0};  //should initialis the c arry here
-    float B[]={60,72,100};  // should initialis the b array here
-    float a[3][6] = {    //should intialise the A[][] array here
+    float C[]= {-x,-y,-z,0,0,0};  //initialize the c arary
+    float B[]={60,72,100};  // init b array
+    float a[3][6] = {    //init A[][] array
                          { 3,  5,  1, 1, 0, 0},
                          { 4,  4,  4, 0, 1, 0},
                          { 2,  4,  5, 0, 0, 1}

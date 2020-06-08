@@ -228,7 +228,7 @@ void Simplex::CalculateSimplex()
     bool end = false;
 
     qDebug()<<"initial array(Not optimal)"<<endl;
-   // print();
+    print();
 
     qDebug()<<" "<<endl;
     qDebug()<<"final array(Optimal solution)"<<endl;
