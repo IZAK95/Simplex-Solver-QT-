@@ -1,4 +1,5 @@
 #include "simplex.h"
+#include <QDebug>
 
 Simplex::Simplex()
 {
@@ -8,6 +9,8 @@ Simplex::Simplex()
 void Simplex::init(const QTableWidget *lim, const QTableWidget *fn)
 {
     stdForm(lim,fn);
+    createMatrixCoeff();
+    qDebug()<<"Simplex Initialized"<<endl;
 }
 
 
@@ -79,4 +82,57 @@ void Simplex::stdForm(const QTableWidget *lim, const QTableWidget *fn)
                 additionalVars.push_back(0);
         }
     }
+    qDebug()<<"Standard Form"<<endl;
+}
+
+void Simplex::createMatrixCoeff()
+{
+    for (int i = 0; i < standardLim.size(); ++i)
+            matrixCoeff.push_back(*new QVector<int>());
+
+        for (int i = 0; i < matrixCoeff.size(); ++i)
+            for (int j = 0; j < standardLim[0].size() - 1; ++j)
+                matrixCoeff[i].push_back(standardLim[i][j]);
+
+        for (int i = 0; i < standardFunction.size(); ++i)
+            allVars.push_back(qMakePair(standardFunction[i], "x" + QString::number(i + 1)));
+
+        for (int i = 0; i < additionalVars.size(); ++i) {
+            static int addVarCount = 1;
+            if (additionalVars[i] != 0) {
+                for (int j = 0; j < matrixCoeff.size(); ++j)
+                    matrixCoeff[j].push_back(0);
+                matrixCoeff[i][matrixCoeff[0].size() - 1] = additionalVars[i];
+                allVars.push_back(qMakePair(0, "u" + QString::number(addVarCount++)));
+            }
+        }
+        //Lamdda function to find basis row
+        auto findBasisRow = [=] (const int &row_Where) {
+            for (int i = 0; i < standardLim[0].size() - 1; ++i) {
+                if (matrixCoeff[row_Where][i] == 1) {
+                    for (int j = 0; j < matrixCoeff.size(); ++j) {
+                        if (row_Where == j) continue;
+                        if (matrixCoeff[j][i] != 0)
+                            goto next;
+                    }
+                    return i;
+                }
+            next:
+                continue;
+            }
+            return -1;
+        };
+
+        for (int i = 0; i < standardLim.size(); ++i) {
+            if (findBasisRow(i) == -1 && additionalVars[i] != 1) {
+                static int wVarCount = 1;
+                for (int j = 0; j < matrixCoeff.size(); ++j)
+                    matrixCoeff[j].push_back(0);
+
+                matrixCoeff[i][matrixCoeff[0].size() - 1] = 1;
+                allVars.push_back(qMakePair(-1, "W" + QString::number(wVarCount++)));
+            }
+        }
+        artificialBasis = allVars[allVars.size() - 1].second[0] == 'W';
+        qDebug()<<"Coefficients Created "<<endl;
 }

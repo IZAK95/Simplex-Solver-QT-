@@ -106,7 +106,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
     // Constraint Matrix
     TableWidget(lim, rows, columns + 2);
 
-
+    //Add operators
     for (int i = 0; i < rows; ++i) {
         QComboBox *combo = new QComboBox(this);
         combo->addItem(" ≥ ");

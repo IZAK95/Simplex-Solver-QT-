@@ -19,6 +19,10 @@ public:
     QVector<QVector<int>> standardLim;
     QVector<int> additionalVars;
     int numAdditionalVars = 0;
+    QVector<QVector<int>> matrixCoeff;
+    void createMatrixCoeff();
+    QVector<QPair<int, QString>> allVars;
+    bool artificialBasis = false;
 };
 
 #endif // SIMPLEX_H
