@@ -9,6 +9,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("REII313 Practical");
+
+//    QWidget *backGround = new QWidget();
+//    backGround->setGeometry(0,0,300,100);
+//    QPalette *paletteBack = new QPalette();
+
+//    paletteBack->setColor(QPalette::Background, Qt::black);
+//    backGround->setAutoFillBackground(true);
+//    backGround->setPalette(paletteBack);
+
+
     Setup();
 }
 
@@ -16,6 +26,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 void MainWindow::Setup()
 {
@@ -33,11 +44,9 @@ void MainWindow::Setup()
 
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
-    layout->setVerticalSpacing(50);
-
     //Insert Title
     QLabel *labelTitle = new QLabel("REII313 Prakties",this);
-    labelTitle->setMinimumWidth(300);
+    labelTitle->setMinimumWidth(100);
     labelTitle->setMinimumHeight(100);
     labelTitle->setFont(TitleFont);
     layout->addWidget(labelTitle,0,0);
@@ -66,10 +75,13 @@ void MainWindow::Setup()
     layout->addWidget(spinColumnsCount, 3, 1);
 
     QPushButton *buttonContinue = new QPushButton("Next", this);
-   // buttonContinue->setPalette(labelQPalette);
-    layout->addWidget(buttonContinue);
+    buttonContinue->setMinimumSize(button_minX,button_minY);
+    buttonContinue->setMaximumSize(button_maxX,button_maxY);
+    layout->addWidget(buttonContinue,4,1);
+
+    widget->move(170, 0);
     widget->adjustSize();
-    widget->move(minimum_X, minimum_Y);
+  //  widget->move(minimum_X, minimum_Y);
     widget->show();
 
     connect(buttonContinue, &QPushButton::clicked, this, [=]() {
@@ -124,11 +136,13 @@ void MainWindow::GetVal(const int &rows, const int &columns)
         layout->addWidget(function, 1, 0);
 
         QPushButton *buttonContinue = new QPushButton("Solve", this);
-        buttonContinue->setMinimumSize(100,50);
+        buttonContinue->setMinimumSize(button_minX,button_minY);
+        buttonContinue->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonContinue, 3, 0);
 
         QPushButton *buttonBack = new QPushButton("Back", this);
-        //buttonBack->setMinimumSize(100,50);
+        buttonBack->setMinimumSize(button_minX,button_minY);
+        buttonBack->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonBack, 2, 0);
 
 
