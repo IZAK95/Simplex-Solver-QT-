@@ -14,12 +14,16 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QGroupBox>
+#include <QPalette>
 
 
 const int minimum_Y = 0;
 const int minimum_X = 0;
-const int tableColumnWidth = 60;
-const int tableRowHeight = 35;
+
+//These values determine the size of the Table Rows and Columns
+const int tableColumnWidth = 100;
+const int tableRowHeight = 50;
+
 const int QTextEditRowHeight = 26;
 const int buttonWidth = 170;
 const int buttonHeight = 30;
