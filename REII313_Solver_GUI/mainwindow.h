@@ -47,10 +47,10 @@ public:
     void Setup();
     void GetVal(const int &rows, const int &columns);
     void TableWidget(QTableWidget *table, const int &rows, const int &columns);
-    bool Verify(const QTableWidget *limitations, const QTableWidget *function) const;
+    bool Verify(const QTableWidget *lim, const QTableWidget *fn) const;
 
 private:
     Ui::MainWindow *ui;
-    QTableWidget *limitations, *function;
+    QTableWidget *lim, *fn;
 };
 #endif // MAINWINDOW_H

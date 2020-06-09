@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
-
+#include "simplex.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -88,7 +88,7 @@ void MainWindow::Setup()
         widget->hide();
 
         MainWindow::GetVal(spinRowsCount->value(), spinColumnsCount->value());
-        //Grabs values from the UI and sends it to the TableWidget function in order to determine table size.
+        //Grabs values from the UI and sends it to the TableWidget fn in order to determine table size.
         int r = spinRowsCount->value();
         int c = spinColumnsCount->value();
         qDebug()<<r<<endl;
@@ -102,9 +102,9 @@ void MainWindow::GetVal(const int &rows, const int &columns)
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
     layout->setSpacing(0);
-    limitations = new QTableWidget(this);
+    lim = new QTableWidget(this);
     // Constraint Matrix
-    TableWidget(limitations, rows, columns + 2);
+    TableWidget(lim, rows, columns + 2);
 
 
     for (int i = 0; i < rows; ++i) {
@@ -112,34 +112,34 @@ void MainWindow::GetVal(const int &rows, const int &columns)
         combo->addItem(" ≥ ");
         combo->addItem(" ≤ ");
         combo->addItem(" = ");
-        limitations->setCellWidget(i, columns, combo);
+        lim->setCellWidget(i, columns, combo);
 
         for (int i = 0; i < columns; ++i)
-            limitations->setHorizontalHeaderItem(i, new QTableWidgetItem("x" + QString::number(i + 1)));
+            lim->setHorizontalHeaderItem(i, new QTableWidgetItem("x" + QString::number(i + 1)));
 
-        limitations->setHorizontalHeaderItem(columns, new QTableWidgetItem("Sign"));
-        limitations->setHorizontalHeaderItem(columns + 1, new QTableWidgetItem("Equal"));
-        layout->addWidget(limitations, 0, 0);
-        function = new QTableWidget(this);
+        lim->setHorizontalHeaderItem(columns, new QTableWidgetItem("Sign"));
+        lim->setHorizontalHeaderItem(columns + 1, new QTableWidgetItem("Equal"));
+        layout->addWidget(lim, 0, 0);
+        fn = new QTableWidget(this);
 
 
-        // objective function
-        TableWidget(function, 1, columns + 1);
+        // objective fn
+        TableWidget(fn, 1, columns + 1);
         QComboBox *extr = new QComboBox(this);
         extr->addItem("max");
         extr->addItem("min");
-        function->setCellWidget(0, columns, extr);
+        fn->setCellWidget(0, columns, extr);
         for (int i = 0; i < columns; ++i)
-            function->setHorizontalHeaderItem(i, new QTableWidgetItem("x" + QString::number(i + 1)));
+            fn->setHorizontalHeaderItem(i, new QTableWidgetItem("x" + QString::number(i + 1)));
 
-        function->setHorizontalHeaderItem(columns, new QTableWidgetItem("Min/Max"));
-        layout->addWidget(function, 1, 0);
-
+        fn->setHorizontalHeaderItem(columns, new QTableWidgetItem("Min/Max"));
+        layout->addWidget(fn, 1, 0);
+        //Add Next Button
         QPushButton *buttonContinue = new QPushButton("Solve", this);
         buttonContinue->setMinimumSize(button_minX,button_minY);
         buttonContinue->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonContinue, 3, 0);
-
+        //Add Back Button
         QPushButton *buttonBack = new QPushButton("Back", this);
         buttonBack->setMinimumSize(button_minX,button_minY);
         buttonBack->setMaximumSize(button_maxX,button_maxY);
@@ -158,7 +158,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
 
         connect(buttonContinue, &QPushButton::clicked, this, [=]() {              
-            if (!MainWindow::Verify(limitations, function)) {
+            if (!MainWindow::Verify(lim, fn)) {
 
                 QMessageBox *msg = new QMessageBox();
                 msg->warning(this,"Error"," Not all fields are filled in.");
@@ -166,14 +166,16 @@ void MainWindow::GetVal(const int &rows, const int &columns)
                 return ;
             }
             widget->hide();
+            Simplex *solution = new Simplex;
+            solution->init(lim,fn);
             // simplex = new Simplex();
-            // simplex->initialize(limitations, function);
+            // simplex->initialize(lim, fn);
             // MainWindow::ShowCanonicalLimitationsAndMatrixCoefficients();
         });
     }
 }
 
-//This function draws the table based on the amount of variables and iunputs.
+//This fn draws the table based on the amount of variables and iunputs.
 void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &columns)
 {
     table->setRowCount(rows);
@@ -188,27 +190,27 @@ void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &co
     }
 }
 
-bool MainWindow::Verify(const QTableWidget *limitations, const QTableWidget *function) const
+bool MainWindow::Verify(const QTableWidget *lim, const QTableWidget *fn) const
 {
     QRegExp check("-?\\d{1,6}");
-    for (int i = 0; i < function->columnCount() - 1; ++i) {
-        if (function->item(0, i) != nullptr) {
-            if (!check.exactMatch(function->item(0, i)->text()))
+    for (int i = 0; i < fn->columnCount() - 1; ++i) {
+        if (fn->item(0, i) != nullptr) {
+            if (!check.exactMatch(fn->item(0, i)->text()))
                 return false;
         }
         else return false;
     }
 
-    for (int i = 0; i < limitations->rowCount(); ++i) {
-        for (int j = 0; j < limitations->columnCount() - 2; ++j) {
-            if (limitations->item(i, j) != nullptr) {
-                if (!check.exactMatch(limitations->item(i, j)->text()))
+    for (int i = 0; i < lim->rowCount(); ++i) {
+        for (int j = 0; j < lim->columnCount() - 2; ++j) {
+            if (lim->item(i, j) != nullptr) {
+                if (!check.exactMatch(lim->item(i, j)->text()))
                     return false;
             }
             else return false;
         }
-        if (limitations->item(i, limitations->columnCount() - 1) != nullptr) {
-            if (!check.exactMatch(limitations->item(i, limitations->columnCount() - 1)->text()))
+        if (lim->item(i, lim->columnCount() - 1) != nullptr) {
+            if (!check.exactMatch(lim->item(i, lim->columnCount() - 1)->text()))
                 return false;
         }
         else return false;

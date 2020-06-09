@@ -17,10 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    simplex.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    simplex.h
 
 FORMS += \
     mainwindow.ui
