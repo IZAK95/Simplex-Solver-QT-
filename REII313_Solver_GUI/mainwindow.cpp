@@ -21,7 +21,7 @@ void MainWindow::Setup()
 {
      //Define Fonts Used
      QFont DefaultFont("Times",15);
-     QFont TitleFont("Times", 30, QFont::Bold);
+     QFont TitleFont("Times", 35, QFont::Bold);
 
      //Set BackGround Colours
 
@@ -33,30 +33,37 @@ void MainWindow::Setup()
 
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
+    layout->setVerticalSpacing(50);
 
     //Insert Title
-    QLabel *label = new QLabel("REII313 Prakties",this);
-    label->setMinimumWidth(300);
-    label->setMinimumHeight(100);
-    label->setFont(TitleFont);
-    layout->addWidget(label,0,0);
+    QLabel *labelTitle = new QLabel("REII313 Prakties",this);
+    labelTitle->setMinimumWidth(300);
+    labelTitle->setMinimumHeight(100);
+    labelTitle->setFont(TitleFont);
+    layout->addWidget(labelTitle,0,0);
 
+    //Insert Description
+    QLabel *labelDescription = new QLabel();
+    labelDescription->setFont(DefaultFont);
+    labelDescription->setText("Done by Izak Adendorff and Izelle Evert");
+    layout->addWidget(labelDescription,1,0);
+    layout->setVerticalSpacing(10);
 
     QLabel *labelRowsCount = new QLabel(" Number of limits (rows):", this);
-    layout->addWidget(labelRowsCount, 1, 0);
+    layout->addWidget(labelRowsCount, 2, 0);
 
     QSpinBox *spinRowsCount = new QSpinBox(this); // Number of lines (number of restrictions)
     spinRowsCount->setRange(2, 20);
 
-    layout->addWidget(spinRowsCount, 1, 1);
+    layout->addWidget(spinRowsCount, 2, 1);
 
     QLabel *labelColumnsCount = new QLabel("Number of variables (columns):", this);
-    layout->addWidget(labelColumnsCount, 2, 0);
+    layout->addWidget(labelColumnsCount, 3, 0);
 
     QSpinBox *spinColumnsCount = new QSpinBox(this);
     // Number of columns (number of variables)
     spinColumnsCount->setRange(2, 20);
-    layout->addWidget(spinColumnsCount, 2, 1);
+    layout->addWidget(spinColumnsCount, 3, 1);
 
     QPushButton *buttonContinue = new QPushButton("Next", this);
    // buttonContinue->setPalette(labelQPalette);
@@ -140,7 +147,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
             if (!MainWindow::Verify(limitations, function)) {
 
                 QMessageBox *msg = new QMessageBox();
-                msg->warning(this,"Error"," Not all fields are filled.");
+                msg->warning(this,"Error"," Not all fields are filled in.");
 
                 return ;
             }
