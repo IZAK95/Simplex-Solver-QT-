@@ -85,6 +85,7 @@ void Simplex::stdForm(const QTableWidget *lim, const QTableWidget *fn)
     qDebug()<<"Standard Form"<<endl;
 }
 
+
 void Simplex::createMatrixCoeff()
 {
     for (int i = 0; i < standardLim.size(); ++i)
@@ -135,4 +136,257 @@ void Simplex::createMatrixCoeff()
         }
         artificialBasis = allVars[allVars.size() - 1].second[0] == 'W';
         qDebug()<<"Coefficients Created "<<endl;
+}
+
+bool Simplex::isOptimal() const
+{
+    for (int i = 0; i < matrix[0].size() - 1; ++i)
+        if (matrix[matrix.size() - 1][i] < 0)
+            return false;
+    return true;
+}
+
+bool Simplex::isExtraProblem() const
+{
+    bool isOneFound = false;
+    for (int i = 0; i < matrix[0].size() - 1; ++i) {
+        if (matrix[matrix.size() - 1][i] == 1) {
+            isOneFound = true;
+            break;
+        }
+    }
+    if (!isOneFound || matrix[matrix.size() - 1][matrix[0].size() - 1] != 0)
+        return false;
+    return true;
+}
+
+int Simplex::getCurrentGuidingRow() const
+{
+    return guiding_row;
+}
+
+int Simplex::getCurrentGuidingColumn() const
+{
+    return guiding_column;
+}
+
+int Simplex::findGuidingRow(const int &guidingColumn) const
+{
+    Fraction min(INT_MAX);
+    int INDEX = -1;
+    for (int i = 0; i < matrix.size() - 1; ++i) {
+        if (matrix[i][guidingColumn].getNumerator() > 0) {
+            if (matrix[i][matrix[0].size() - 1] / matrix[i][guidingColumn] < min) {
+                min = matrix[i][matrix[0].size() - 1] / matrix[i][guidingColumn];
+                INDEX = i;
+            }
+        }
+    }
+    return INDEX;
+}
+
+int Simplex::findGuidingColumn() const
+{
+    Fraction min(-1, 10000000000);
+    int INDEX = -1;
+    for (int i = 0; i < matrix[0].size() - 1; ++i) {
+        if (matrix[matrix.size() - 1][i] < min) {
+            min = matrix[matrix.size() - 1][i];
+            INDEX = i;
+        }
+    }
+    return  INDEX;
+}
+
+QString Simplex::getAnswer() const
+{
+    switch (solveStatus) {
+    case SolveResult::SOLVED:
+        return "The problem is solved.";
+    case SolveResult::UNLIMITED:
+        return "The function is not limited to the set of feasible solutions; it is impossible to find the optimal plan.";
+    case SolveResult::NO_SOLUTIONS:
+        return " The value of the function is positive and there are artificial variables in the basis.\n"
+               "The original problem is unsolvable "
+               "because of the inconsistency of the system of restrictions..";
+    case SolveResult::UNSOLVED:
+        return "The problem is not solved";
+    }
+}
+
+void Simplex::prepare()
+{
+    if (isOptimal()) {
+        guiding_row = -1;
+        guiding_column = -1;
+        if (artificialBasis) {
+            if (isExtraProblem()) {
+                shouldRemoveColumns = true;
+                solveStatus = SolveResult::UNSOLVED;
+                artificialBasis = false;
+                return;
+            }
+            else {
+                solveStatus = SolveResult::NO_SOLUTIONS;
+                return;
+            }
+        }
+        solveStatus = SolveResult::SOLVED;
+        return;
+    }
+    guiding_column = findGuidingColumn();
+    guiding_row = findGuidingRow(guiding_column);
+    if (guiding_row == -1)
+        solveStatus = SolveResult::UNLIMITED;
+    else
+        solveStatus = SolveResult::UNSOLVED;
+}
+
+Simplex::SolveResult Simplex::generateNextSimplexMatrix()
+{
+    if (solveStatus != Simplex::SolveResult::UNSOLVED)
+        return solveStatus;
+
+    if (shouldRemoveColumns) {
+        removeColumn();
+        calculateMainBasis();
+        shouldRemoveColumns = false;
+    }
+    else {
+        qSwap(unbasis[guiding_column], basis[guiding_row]);
+        recalculationOfTable(guiding_row, guiding_column);
+    }
+    prepare();
+    return Simplex::SolveResult::UNSOLVED;
+}
+
+Simplex::SolveResult Simplex::getCurrentSolveStatus() const
+{
+    return solveStatus;
+}
+
+QVector<QVector<int> > Simplex::getMatrixCoeff() const
+{
+    return matrixCoeff;
+}
+
+QVector<QPair<int, QString> > Simplex::getAllVars() const
+{
+    return allVars;
+}
+
+QString Simplex::genStdLimAsString() const
+{
+    auto getSign = [](const QString &source) {
+            if (source[0] == '-')
+                return " - " + source.right(source.length() - 1);
+           return " + " + source;
+        };
+        QString s;
+        int uCounter = 0;
+        s += QString::number(standardFunction[0]) + "x<sub>1</sub>";
+        for (int i = 1; i < standardFunction.size(); ++i)
+            s += getSign(QString::number(standardFunction[i])) + "x<sub>" + QString::number(i + 1) + "</sub>";
+
+        s += " —> max<br>";
+        for (int i = 0; i < standardLim.size(); ++i) {
+            s += QString::number(standardLim[i][0]) + "x<sub>1</sub>";
+            for (int j = 1; j < standardLim[0].size() - 1; ++j)
+                s += getSign(QString::number(standardLim[i][j])) + "x<sub>" + QString::number(j + 1) + "</sub>";
+
+            if (additionalVars[i] != 0) {
+                if (additionalVars[i] == 1)
+                    s += " + u<sub>" + QString::number(++uCounter) + "</sub>";
+                else s += " - u<sub>" + QString::number(++uCounter) + "</sub>";
+            }
+            s += " = " + QString::number(standardLim[i][standardLim[0].size() - 1]) + "<br>";
+        }
+        return s;
+}
+
+void Simplex::removeColumn()
+{
+    for (int i = 0; i < matrix[0].size() - 1; ++i) {
+        if (matrix[matrix.size() - 1][i].getNumerator() == 1) {
+            for (int j = 0; j < matrix.size(); ++j)
+                matrix[j].erase(matrix[j].begin() + i);
+
+            unbasis.erase(unbasis.begin() + i);
+             --i;
+        }
+    }
+}
+
+void Simplex::calculateMainBasis()
+{
+    {
+        for (int i = 0; i < matrix[0].size(); ++i) {
+            Fraction value(0);
+            for (int j = 0; j < basis.size(); ++j)
+                value += basis[j].first * matrix[j][i];
+
+            value -= unbasis[i].first;
+            matrix[matrix.size() - 1][i] = value;
+        }
+}
+
+}
+QVector<QPair<int, QString> > Simplex::getBasis() const
+{
+    if (artificialBasis || shouldRemoveColumns) {
+        QVector<QPair<int, QString>> tbasis = basis;
+        for (auto &i : tbasis) {
+            if (i.second[0] != 'W')
+                i.first = 0;
+        }
+        return tbasis;
+    }
+    return basis;
+}
+
+QVector<QPair<int, QString> > Simplex::getUnbasis() const
+{
+    if (artificialBasis || shouldRemoveColumns) {
+        QVector<QPair<int, QString>> tunbasis = unbasis;
+        for (auto &i : tunbasis) {
+            if (i.second[0] != 'W')
+                i.first = 0;
+        }
+        return tunbasis;
+    }
+    return  unbasis;
+}
+
+QVector<QVector<Fraction> > Simplex::getMatrix() const
+{
+    return matrix;
+}
+
+void Simplex::recalculationOfTable(const int &guiding_row, const int &guiding_column)
+{
+    QVector<QVector<Fraction>> temp;
+    for (int i = 0; i < matrix.size(); ++i)
+        temp.push_back(*new QVector<Fraction>(matrix[0].size()));
+
+    Fraction resElem = matrix[guiding_row][guiding_column];
+    for (int i = 0; i < matrix.size(); ++i) {
+        for (int j = 0; j < matrix[0].size(); ++j) {
+            if (i == guiding_row && j == guiding_column) {
+                temp[i][j] = 1 / resElem;
+                continue;
+            }
+            if (i == guiding_row) {
+                temp[i][j] = matrix[i][j] / resElem;
+                continue;
+            }
+            if (j == guiding_column) {
+                temp[i][j] = -1 * matrix[i][j] / resElem;
+                continue;
+            }
+            temp[i][j] = ((resElem * matrix[i][j]) - (matrix[i][guiding_column] * matrix[guiding_row][j])) / resElem;
+        }
+    }
+    for (int i = 0; i < matrix.size(); ++i)
+        for (int j = 0; j < matrix[0].size(); ++j)
+            matrix[i][j] = temp[i][j];
 }

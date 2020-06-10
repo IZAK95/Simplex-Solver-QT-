@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "simplex.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     Setup();
+    qDebug()<<"Setup Complete, init Main Window"<<endl;
 }
 
 MainWindow::~MainWindow()
@@ -95,6 +97,7 @@ void MainWindow::Setup()
         qDebug()<<c<<endl;
 
     });
+    qDebug()<<"Setup Complete"<<endl;
 }
 
 void MainWindow::GetVal(const int &rows, const int &columns)
@@ -168,14 +171,14 @@ void MainWindow::GetVal(const int &rows, const int &columns)
             widget->hide();
             Simplex *solution = new Simplex;
             solution->init(lim,fn);
-            // simplex = new Simplex();
-            // simplex->initialize(lim, fn);
+
             // MainWindow::ShowCanonicalLimitationsAndMatrixCoefficients();
+            qDebug()<<"Get values"<<endl;
         });
     }
 }
 
-//This fn draws the table based on the amount of variables and iunputs.
+//Create QTable with the values entered by the user
 void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &columns)
 {
     table->setRowCount(rows);
@@ -188,6 +191,7 @@ void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &co
     table->setFixedSize(table->horizontalHeader()->length() + table->verticalHeader()->width() + 2,
                         table->verticalHeader()->length() + table->horizontalHeader()->height() + 2);
     }
+    qDebug()<<"Table created"<<endl;
 }
 
 bool MainWindow::Verify(const QTableWidget *lim, const QTableWidget *fn) const
@@ -216,5 +220,158 @@ bool MainWindow::Verify(const QTableWidget *lim, const QTableWidget *fn) const
         else return false;
     }
     return true;
+
+    qDebug()<<"Ran verification"<<endl;
+}
+
+void MainWindow::ShowMatrix()
+{
+    QWidget *widget = new QWidget(this);
+
+        QHBoxLayout *layout = new QHBoxLayout(widget);
+        layout->setSizeConstraint(QLayout::SetFixedSize);
+
+        QTextEdit *textEdit = new QTextEdit(this);
+
+        textEdit->setReadOnly(true);
+        textEdit->setText(simplex->genStdLimAsString());
+        textEdit->setFont(QFont("Calibri", 13));
+        textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        const QVector<QPair<int, QString>> allVariables = simplex->getAllVars();
+        const QVector<QVector<int>> matrixCoefficients = simplex->getMatrixCoeff();
+
+        layout->addWidget(textEdit);
+
+        QTableWidget *tableCoefficients = new QTableWidget(this);
+
+        TableWidget(tableCoefficients, matrixCoefficients.size(), matrixCoefficients[0].size());
+        layout->addWidget(tableCoefficients);
+        tableCoefficients->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        for (int i = 0; i < tableCoefficients->rowCount(); ++i)
+            for (int j = 0; j < tableCoefficients->columnCount(); ++j)
+                tableCoefficients->setItem(i, j, new QTableWidgetItem(QString::number(matrixCoefficients[i][j])));
+        for (int i = 0; i < allVariables.size(); ++i)
+            tableCoefficients->setHorizontalHeaderItem(i, new QTableWidgetItem(allVariables[i].second));
+
+        QScrollArea *area = new QScrollArea();
+        area->setFrameShape(QFrame::NoFrame);
+        area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        area->setWidget(tableCoefficients);
+        area->setFixedSize(QGuiApplication::primaryScreen()->size().width() - textEdit->width() - textEdit->pos().x() - 20, tableCoefficients->height() + 20);
+        layout->addWidget(area);
+        textEdit->setFixedSize(35 * fn->columnCount() * 2, area->height()  );
+        widget->adjustSize();
+        widget->move(minimum_X, minimum_Y);
+        widget->show();
+        //CreateSimplexTable(minimum_Y + widget->height());
+}
+
+void MainWindow::ShowStdLimAndMatrixCoeff()
+{
+    QWidget *widget = new QWidget(this);
+
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
+
+    QTextEdit *textEdit = new QTextEdit(this);
+
+    textEdit->setReadOnly(true);
+    textEdit->setText(simplex->genStdLimAsString());
+    textEdit->setFont(QFont("Calibri", 13));
+    textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    const QVector<QPair<int, QString>> allVariables = simplex->getAllVars();
+    const QVector<QVector<int>> matrixCoefficients = simplex->getMatrixCoeff();
+
+    layout->addWidget(textEdit);
+
+    QTableWidget *tableCoefficients = new QTableWidget(this);
+    TableWidget(tableCoefficients, matrixCoefficients.size(), matrixCoefficients[0].size());
+    layout->addWidget(tableCoefficients);
+    tableCoefficients->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    for (int i = 0; i < tableCoefficients->rowCount(); ++i)
+        for (int j = 0; j < tableCoefficients->columnCount(); ++j)
+            tableCoefficients->setItem(i, j, new QTableWidgetItem(QString::number(matrixCoefficients[i][j])));
+    for (int i = 0; i < allVariables.size(); ++i)
+        tableCoefficients->setHorizontalHeaderItem(i, new QTableWidgetItem(allVariables[i].second));
+
+    QScrollArea *area = new QScrollArea();
+    area->setFrameShape(QFrame::NoFrame);
+    area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    area->setWidget(tableCoefficients);
+    area->setFixedSize(QGuiApplication::primaryScreen()->size().width() - textEdit->width() - textEdit->pos().x() - 20, tableCoefficients->height() + 20);
+    layout->addWidget(area);
+    textEdit->setFixedSize(35 * fn->columnCount() * 2, area->height()  );
+    widget->adjustSize();
+    widget->move(minimum_X, minimum_Y);
+    widget->show();
+    CreateSimpTable(minimum_Y + widget->height());
+}
+
+void MainWindow::CreateSimpTable(const int &position_Y)
+{
+    int Y = position_Y;
+    const int mheight = QGuiApplication::primaryScreen()->size().height();
+    int iRow = 0;
+    int iColumn = 0;
+    int tableCount  = 0;
+    QWidget *widget = new QWidget(this);
+    QGridLayout *layout = new QGridLayout(widget);
+    QVBoxLayout *groupBoxLayout;
+    QGroupBox *groupBox;
+
+    do {
+        groupBox = new QGroupBox("Table No" + QString::number(++tableCount));
+        groupBoxLayout = new QVBoxLayout(groupBox);
+
+        const QVector<QPair<int, QString>> basis = simplex->getBasis();
+        const QVector<QPair<int, QString>> unbasis = simplex->getUnbasis();
+        const QVector<QVector<Fraction>> matrix = simplex->getMatrix();
+
+        QTableWidget *simplexTable = new QTableWidget();
+
+        TableWidget(simplexTable, matrix.size(), matrix[0].size());
+        simplexTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        for (int i = 0; i < simplexTable->rowCount(); ++i)
+            for (int j = 0; j < simplexTable->columnCount(); ++j)
+                simplexTable->setItem(i, j, new QTableWidgetItem(matrix[i][j].getFraction()));
+        for (int i = 0; i < basis.size(); ++i)
+            simplexTable->setVerticalHeaderItem(i, new QTableWidgetItem(QString::number(basis[i].first) + " " + basis[i].second));
+        simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
+        for (int i = 0; i < unbasis.size(); ++i)
+            simplexTable->setHorizontalHeaderItem(i, new QTableWidgetItem(QString::number(unbasis[i].first) + "\n" + unbasis[i].second));
+        if (simplex->getCurrentGuidingRow() != -1 && simplex->getCurrentGuidingColumn() != -1)
+            simplexTable->item(simplex->getCurrentGuidingRow(), simplex->getCurrentGuidingColumn())->setBackground(QColor(0xE656FF));
+
+        groupBoxLayout->addWidget(simplexTable);
+        groupBox->adjustSize();
+
+        layout->addWidget(groupBox, iRow, iColumn);
+        ++iRow;
+
+        Y += groupBox->height();
+
+        if (Y + groupBox->height() + 25 > mheight) {
+            Y = position_Y;
+            iRow = 0;
+            ++iColumn;
+        }
+    } while (Simplex::SolveResult::UNSOLVED == simplex->generateNextSimplexMatrix());
+
+    QLabel *lblAnswer = new QLabel(simplex->getAnswer());
+    lblAnswer->setStyleSheet("color: green;");
+    QFont font;
+    font.setPointSize(10);
+    lblAnswer->setFont(font);
+    groupBoxLayout->addWidget(lblAnswer);
+
+    layout->addWidget(groupBox, --iRow, iColumn);
+
+    widget->setLayout(layout);
+    QScrollArea *area = new QScrollArea(this);
+    area->setWidget(widget);
+    area->setGeometry(minimum_X, position_Y, QGuiApplication::primaryScreen()->size().width() - minimum_X - 7,
+                      mheight - position_Y - 80);
+
+    area->show();
 }
 

@@ -15,10 +15,12 @@
 #include <QScrollArea>
 #include <QGroupBox>
 #include <QPalette>
+#include "simplex.h"
 
+
+//Define limits for buttons to be used in the grid layouts
 const int button_minX = 35;
 const int button_minY = 35;
-
 const int button_maxX = 70;
 const int button_maxY = 70;
 
@@ -48,9 +50,12 @@ public:
     void GetVal(const int &rows, const int &columns);
     void TableWidget(QTableWidget *table, const int &rows, const int &columns);
     bool Verify(const QTableWidget *lim, const QTableWidget *fn) const;
-
+    void ShowMatrix();
+    void ShowStdLimAndMatrixCoeff();
+    void CreateSimpTable(const int &position_Y);
 private:
     Ui::MainWindow *ui;
     QTableWidget *lim, *fn;
+    Simplex *simplex;
 };
 #endif // MAINWINDOW_H

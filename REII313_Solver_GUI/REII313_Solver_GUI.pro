@@ -21,6 +21,7 @@ SOURCES += \
     simplex.cpp
 
 HEADERS += \
+    fraction.h \
     mainwindow.h \
     simplex.h
 
