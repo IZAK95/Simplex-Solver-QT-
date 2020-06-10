@@ -68,7 +68,7 @@ QString Simplex::getAnswer() const
 {
     switch (solveStatus) {
     case SolveResult::SOLVED:
-        return "The problem is solved.";
+        return "The problem is solved. And the optimal solution is displayed.";
     case SolveResult::UNLIMITED:
         return "The function is not limited to the set of feasible solutions; it is impossible to find the optimal plan.";
     case SolveResult::NO_SOLUTIONS:
@@ -109,8 +109,8 @@ QString Simplex::generateString() const
 }
 
 /// Private------------------------------------------------------------------------------------------------------------------------------------
-//Preparing a simplex table for the next step: checking for optimality, checking for an artificial basis,
-// search for the reference row and column.
+
+//Initializng the simplex table,running checks and searching referance rows and columns.
 void Simplex::prepare()
 {
     if (isOptimal()) {
@@ -131,8 +131,8 @@ void Simplex::prepare()
         solveStatus = SolveResult::SOLVED;
         return;
     }
-    guiding_column = findGuidingColumn();
-    guidingRow = findGuidingRow(guiding_column);
+    guiding_column = findGuidingColumn();               //Reference Column
+    guidingRow = findGuidingRow(guiding_column);        //Referance Row
     if (guidingRow == -1)
         solveStatus = SolveResult::UNLIMITED;
     else
