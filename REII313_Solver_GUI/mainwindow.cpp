@@ -4,31 +4,23 @@
 #include "simplex.h"
 
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     setWindowTitle("REII313 Practical");
-
-//    QWidget *backGround = new QWidget();
-//    backGround->setGeometry(0,0,300,100);
-//    QPalette *paletteBack = new QPalette();
-
-//    paletteBack->setColor(QPalette::Background, Qt::black);
-//    backGround->setAutoFillBackground(true);
-//    backGround->setPalette(paletteBack);
-
-
     Setup();
+
     qDebug()<<"Setup Complete, init Main Window"<<endl;
 }
-
+//*********************************************************************************************************************************************************************
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
+//*********************************************************************************************************************************************************************
 
 void MainWindow::Setup()
 {
@@ -47,7 +39,7 @@ void MainWindow::Setup()
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
     //Insert Title
-    QLabel *labelTitle = new QLabel("REII313 Praktical \nLinear Program Solver",this);
+    QLabel *labelTitle = new QLabel("REII313 Practical \nLinear Program Solver",this);
     labelTitle->setMinimumWidth(100);
     labelTitle->setMinimumHeight(100);
     labelTitle->setFont(TitleFont);
@@ -99,7 +91,7 @@ void MainWindow::Setup()
     });
     qDebug()<<"Setup Complete"<<endl;
 }
-
+//*********************************************************************************************************************************************************************
 void MainWindow::GetVal(const int &rows, const int &columns)
 {
     QWidget *widget = new QWidget(this);
@@ -137,6 +129,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
         fn->setHorizontalHeaderItem(columns, new QTableWidgetItem("Min/Max"));
         layout->addWidget(fn, 1, 0);
+
         //Add Next Button
         QPushButton *buttonContinue = new QPushButton("Solve", this);
         buttonContinue->setMinimumSize(button_minX,button_minY);
@@ -161,22 +154,26 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
 
         connect(buttonContinue, &QPushButton::clicked, this, [=]() {              
-            if (!MainWindow::Verify(lim, fn)) {
+            if (!MainWindow::Check(lim, fn)) {
 
                 QMessageBox *msg = new QMessageBox();
-                msg->warning(this,"Error"," Not all fields are filled in.");
+                msg->warning(this,"Error"," Not all fields are filled in or wrong input. Please enter numbers only.");
+                qDebug()<<"Input Error"<<endl;
 
                 return ;
             }
             widget->hide();
-            Simplex *solution = new Simplex;
-            solution->init(lim,fn);
 
-            // MainWindow::ShowCanonicalLimitationsAndMatrixCoefficients();
+            simplex = new Simplex();
+            simplex->initialize(lim, fn);
+            MainWindow::ShowCanonLimAndMatrixCoeff();
+
+
             qDebug()<<"Get values"<<endl;
         });
     }
 }
+//*********************************************************************************************************************************************************************
 
 //Create QTable with the values entered by the user
 void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &columns)
@@ -194,7 +191,8 @@ void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &co
     qDebug()<<"Table created"<<endl;
 }
 
-bool MainWindow::Verify(const QTableWidget *lim, const QTableWidget *fn) const
+//*********************************************************************************************************************************************************************
+bool MainWindow::Check(const QTableWidget *lim, const QTableWidget *fn) const
 {
     QRegExp check("-?\\d{1,6}");
     for (int i = 0; i < fn->columnCount() - 1; ++i) {
@@ -220,53 +218,9 @@ bool MainWindow::Verify(const QTableWidget *lim, const QTableWidget *fn) const
         else return false;
     }
     return true;
-
-    qDebug()<<"Ran verification"<<endl;
 }
 
-void MainWindow::ShowMatrix()
-{
-    QWidget *widget = new QWidget(this);
-
-        QHBoxLayout *layout = new QHBoxLayout(widget);
-        layout->setSizeConstraint(QLayout::SetFixedSize);
-
-        QTextEdit *textEdit = new QTextEdit(this);
-
-        textEdit->setReadOnly(true);
-        textEdit->setText(simplex->genStdLimAsString());
-        textEdit->setFont(QFont("Calibri", 13));
-        textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        const QVector<QPair<int, QString>> allVariables = simplex->getAllVars();
-        const QVector<QVector<int>> matrixCoefficients = simplex->getMatrixCoeff();
-
-        layout->addWidget(textEdit);
-
-        QTableWidget *tableCoefficients = new QTableWidget(this);
-
-        TableWidget(tableCoefficients, matrixCoefficients.size(), matrixCoefficients[0].size());
-        layout->addWidget(tableCoefficients);
-        tableCoefficients->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        for (int i = 0; i < tableCoefficients->rowCount(); ++i)
-            for (int j = 0; j < tableCoefficients->columnCount(); ++j)
-                tableCoefficients->setItem(i, j, new QTableWidgetItem(QString::number(matrixCoefficients[i][j])));
-        for (int i = 0; i < allVariables.size(); ++i)
-            tableCoefficients->setHorizontalHeaderItem(i, new QTableWidgetItem(allVariables[i].second));
-
-        QScrollArea *area = new QScrollArea();
-        area->setFrameShape(QFrame::NoFrame);
-        area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        area->setWidget(tableCoefficients);
-        area->setFixedSize(QGuiApplication::primaryScreen()->size().width() - textEdit->width() - textEdit->pos().x() - 20, tableCoefficients->height() + 20);
-        layout->addWidget(area);
-        textEdit->setFixedSize(35 * fn->columnCount() * 2, area->height()  );
-        widget->adjustSize();
-        widget->move(minimum_X, minimum_Y);
-        widget->show();
-        //CreateSimplexTable(minimum_Y + widget->height());
-}
-
-void MainWindow::ShowStdLimAndMatrixCoeff()
+void MainWindow::ShowCanonLimAndMatrixCoeff()
 {
     QWidget *widget = new QWidget(this);
 
@@ -276,11 +230,12 @@ void MainWindow::ShowStdLimAndMatrixCoeff()
     QTextEdit *textEdit = new QTextEdit(this);
 
     textEdit->setReadOnly(true);
-    textEdit->setText(simplex->genStdLimAsString());
+    textEdit->setText(simplex->generateString());
     textEdit->setFont(QFont("Calibri", 13));
+
     textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     const QVector<QPair<int, QString>> allVariables = simplex->getAllVars();
-    const QVector<QVector<int>> matrixCoefficients = simplex->getMatrixCoeff();
+    const QVector<QVector<int>> matrixCoefficients = simplex->getMatrixCoefficients();
 
     layout->addWidget(textEdit);
 
@@ -304,12 +259,12 @@ void MainWindow::ShowStdLimAndMatrixCoeff()
     widget->adjustSize();
     widget->move(minimum_X, minimum_Y);
     widget->show();
-    CreateSimpTable(minimum_Y + widget->height());
+    CreateSimTable(minimum_Y + widget->height());
 }
 
-void MainWindow::CreateSimpTable(const int &position_Y)
+void MainWindow::CreateSimTable(const int &startPosition_Y)
 {
-    int Y = position_Y;
+    int Y = startPosition_Y;
     const int mheight = QGuiApplication::primaryScreen()->size().height();
     int iRow = 0;
     int iColumn = 0;
@@ -320,7 +275,7 @@ void MainWindow::CreateSimpTable(const int &position_Y)
     QGroupBox *groupBox;
 
     do {
-        groupBox = new QGroupBox("Table No" + QString::number(++tableCount));
+        groupBox = new QGroupBox("Simplex Table Number: " + QString::number(++tableCount));
         groupBoxLayout = new QVBoxLayout(groupBox);
 
         const QVector<QPair<int, QString>> basis = simplex->getBasis();
@@ -333,14 +288,19 @@ void MainWindow::CreateSimpTable(const int &position_Y)
         simplexTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
         for (int i = 0; i < simplexTable->rowCount(); ++i)
             for (int j = 0; j < simplexTable->columnCount(); ++j)
+            {
                 simplexTable->setItem(i, j, new QTableWidgetItem(matrix[i][j].getFraction()));
+                //See values entered into table
+                qDebug()<<matrix[i][j].getFraction()<<endl;
+            }
+
         for (int i = 0; i < basis.size(); ++i)
             simplexTable->setVerticalHeaderItem(i, new QTableWidgetItem(QString::number(basis[i].first) + " " + basis[i].second));
         simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
         for (int i = 0; i < unbasis.size(); ++i)
             simplexTable->setHorizontalHeaderItem(i, new QTableWidgetItem(QString::number(unbasis[i].first) + "\n" + unbasis[i].second));
         if (simplex->getCurrentGuidingRow() != -1 && simplex->getCurrentGuidingColumn() != -1)
-            simplexTable->item(simplex->getCurrentGuidingRow(), simplex->getCurrentGuidingColumn())->setBackground(QColor(0xE656FF));
+            simplexTable->item(simplex->getCurrentGuidingRow(), simplex->getCurrentGuidingColumn())->setBackground(QColor(0x46FF00));
 
         groupBoxLayout->addWidget(simplexTable);
         groupBox->adjustSize();
@@ -351,11 +311,11 @@ void MainWindow::CreateSimpTable(const int &position_Y)
         Y += groupBox->height();
 
         if (Y + groupBox->height() + 25 > mheight) {
-            Y = position_Y;
+            Y = startPosition_Y;
             iRow = 0;
             ++iColumn;
         }
-    } while (Simplex::SolveResult::UNSOLVED == simplex->generateNextSimplexMatrix());
+    } while (Simplex::SolveResult::UNSOLVED == simplex->createNextSimplexMatrix());
 
     QLabel *lblAnswer = new QLabel(simplex->getAnswer());
     lblAnswer->setStyleSheet("color: green;");
@@ -369,9 +329,12 @@ void MainWindow::CreateSimpTable(const int &position_Y)
     widget->setLayout(layout);
     QScrollArea *area = new QScrollArea(this);
     area->setWidget(widget);
-    area->setGeometry(minimum_X, position_Y, QGuiApplication::primaryScreen()->size().width() - minimum_X - 7,
-                      mheight - position_Y - 80);
+    area->setGeometry(minimum_X, startPosition_Y, QGuiApplication::primaryScreen()->size().width() - minimum_X - 7,
+                      mheight - startPosition_Y - 80);
 
     area->show();
 }
+
+
+
 

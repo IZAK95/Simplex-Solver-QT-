@@ -49,10 +49,9 @@ public:
     void Setup();
     void GetVal(const int &rows, const int &columns);
     void TableWidget(QTableWidget *table, const int &rows, const int &columns);
-    bool Verify(const QTableWidget *lim, const QTableWidget *fn) const;
-    void ShowMatrix();
-    void ShowStdLimAndMatrixCoeff();
-    void CreateSimpTable(const int &position_Y);
+    bool Check(const QTableWidget *lim, const QTableWidget *fn) const;
+    void ShowCanonLimAndMatrixCoeff();
+    void CreateSimTable(const int &position_Y);
 private:
     Ui::MainWindow *ui;
     QTableWidget *lim, *fn;
