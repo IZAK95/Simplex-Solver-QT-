@@ -47,7 +47,7 @@ void MainWindow::Setup()
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
     //Insert Title
-    QLabel *labelTitle = new QLabel("REII313 Prakties",this);
+    QLabel *labelTitle = new QLabel("REII313 Praktical \nLinear Program Solver",this);
     labelTitle->setMinimumWidth(100);
     labelTitle->setMinimumHeight(100);
     labelTitle->setFont(TitleFont);
@@ -56,7 +56,7 @@ void MainWindow::Setup()
     //Insert Description
     QLabel *labelDescription = new QLabel();
     labelDescription->setFont(DefaultFont);
-    labelDescription->setText("Done by Izak Adendorff and Izelle Evert");
+    labelDescription->setText("Done by Izak Adendorff (30934672) and Izelle Evert (30238072)");
     layout->addWidget(labelDescription,1,0);
     layout->setVerticalSpacing(10);
 
