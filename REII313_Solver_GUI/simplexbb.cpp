@@ -265,14 +265,14 @@ void SimplexBB::print(){
 
     printf("   Z*=%4.2f",ObjectifFunction);
 
-    cout<<"\n\n"<<"l\'indice de la base :\n    I = { ";
+    cout<<"\n\n"<<"Base Index :\n    I = { ";
     for(int i=0 ; i<rows ; i++){
         cout<<BaseIndex[i];
         if(i != rows-1) cout<<", ";
     }
     cout<<"}"<<endl;
 
-    cout<<"\n"<<"Solution de base :\n    S = { ";
+    cout<<"\n"<<"Basic solution :\n    S = { ";
     for(int i=0 ; i<rows+cols ; i++){
         cout<<BasicSolution[i];
         if(i != rows+cols-1) cout<<", ";
@@ -318,14 +318,14 @@ void SimplexBB::printtff(){
 
     printf("    W=%4.2f",ObjW);
 
-    cout<<"\n\n"<<"l\'indice de la base :\n    I = { ";
+    cout<<"\n\n"<<"Base index :\n    I = { ";
     for(int i=0 ; i<rows ; i++){
         cout<<BaseIndex[i];
         if(i != rows-1) cout<<", ";
     }
     cout<<"}"<<endl;
 
-    cout<<"\n"<<"Solution de base :\n    S = { ";
+    cout<<"\n"<<"Basic solution :\n    S = { ";
     for(int i=0 ; i<rows+cols ; i++){
         cout<<BasicSolution[i];
         if(i != rows+cols-1) cout<<", ";
