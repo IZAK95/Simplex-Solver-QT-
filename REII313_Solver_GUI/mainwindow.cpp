@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include "simplex.h"
+#include "branchandbound.h"
+#include "simplexbb.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -28,18 +30,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::Setup()
 {
-     //Define Fonts Used
-     QFont DefaultFont("Algerian",12);
-     QFont TitleFont("Algerian", 45, QFont::Bold);
-     QFont TextFont("Castellar", 10);
+    //Define Fonts Used
+    QFont DefaultFont("Algerian",12);
+    QFont TitleFont("Algerian", 45, QFont::Bold);
+    QFont TextFont("Castellar", 10);
 
-     //Set BackGround Colours
+    //Set BackGround Colours
 
-     QPalette labelQPalette;
-     labelQPalette.setColor(QPalette::Window,Qt::white);
+    QPalette labelQPalette;
+    labelQPalette.setColor(QPalette::Window,Qt::white);
 
-     //Set Text Colours
-     labelQPalette.setColor(QPalette::WindowText,Qt::blue);
+    //Set Text Colours
+    labelQPalette.setColor(QPalette::WindowText,Qt::blue);
 
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
@@ -88,7 +90,6 @@ void MainWindow::Setup()
 
     widget->move(170, 0);
     widget->adjustSize();
-  //  widget->move(minimum_X, minimum_Y);
     widget->show();
 
     connect(buttonContinue, &QPushButton::clicked, this, [=]() {
@@ -114,7 +115,6 @@ void MainWindow::GetVal(const int &rows, const int &columns)
     QGridLayout *layout = new QGridLayout(widget);
     layout->setSpacing(0);
     lim = new QTableWidget(this);
-    //lim->setFont(DefaultFont);
 
     // Constraint Matrix
     TableWidget(lim, rows, columns + 2);
@@ -178,7 +178,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
 
 
-        connect(buttonContinue, &QPushButton::clicked, this, [=]() {              
+        connect(buttonContinue, &QPushButton::clicked, this, [=]() {
             if (!MainWindow::Check(lim, fn)) {
 
                 QMessageBox *msg = new QMessageBox();
@@ -191,8 +191,8 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
             simplex = new Simplex();
             simplex->initialize(lim, fn);
-           // qDebug()<<"Lim "<<lim<<endl;
-           // qDebug()<<"Fn "<<fn<<endl;
+            // qDebug()<<"Lim "<<lim<<endl;
+            // qDebug()<<"Fn "<<fn<<endl;
             MainWindow::ShowCanonLimAndMatrixCoeff();
 
 
@@ -212,12 +212,12 @@ void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &co
     for (int i = 0; i < columns; ++i)
     {
         table->setColumnWidth(i, tableColumnWidth);
-    table->verticalHeader()->setFixedWidth(tableColumnWidth);
-    table->verticalHeader()->setFont(DefaultFont);
-    table->horizontalHeader()->setFixedHeight(tableRowHeight + 5);
-    table->horizontalHeader()->setFont(DefaultFont);
-    table->setFixedSize(table->horizontalHeader()->length() + table->verticalHeader()->width() + 2,
-                        table->verticalHeader()->length() + table->horizontalHeader()->height() + 2);
+        table->verticalHeader()->setFixedWidth(tableColumnWidth);
+        table->verticalHeader()->setFont(DefaultFont);
+        table->horizontalHeader()->setFixedHeight(tableRowHeight + 5);
+        table->horizontalHeader()->setFont(DefaultFont);
+        table->setFixedSize(table->horizontalHeader()->length() + table->verticalHeader()->width() + 2,
+                            table->verticalHeader()->length() + table->horizontalHeader()->height() + 2);
     }
     qDebug()<<"Table created"<<endl;
 }
@@ -264,7 +264,7 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
 
 
     //Add Close Button
-    QPushButton *buttonClose = new QPushButton("Close", this);
+    QPushButton *buttonClose = new QPushButton("X", this);
     buttonClose->setFont(DefaultFont);
     buttonClose->setMinimumSize(button_minX,button_minY);
     buttonClose->setMaximumSize(button_maxX,button_maxY);
@@ -273,12 +273,75 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     //Add Branch and Bound Button
     QPushButton *branch = new QPushButton("Branch", this);
     branch->setFont(DefaultFont);
-    branch->setMinimumSize(button_minX,button_minY);
+    branch->setMinimumSize(100,button_minY);
     branch->setMaximumSize(button_maxX,button_maxY);
     layout->addWidget(branch, 2, 0);
 
+    //****************************************************************************************************
+    //There wasn't enough time to implement the branch and bound into the GUI, but here is one that will output on the application output panel
+    connect(branch, &QPushButton::clicked, this, [=]() {
+
+
+        //Set amount of rows and columns
+        const int colSize = 2;
+        const int rowSize = 3;
+
+        vector<float> C(colSize,0);
+        vector<float> S(colSize,0);
+        vector<float> B(rowSize,0);
+        vector<vector<float>> A(rowSize,vector<float>(colSize,0));
+
+        vector<string> cc(rowSize);
+        //Set operators
+        cc[0]="<=";
+        cc[1]="<=";
+        cc[2]="<=";
+        // cc[3]=">=";
+        // cc[4]="<=";
+        // cc[5]=">=";
+        // cc[6]="<=";
+
+        string P = "Max";
+
+        //Array c is to implement the goal function
+        //Array b is the values after the operator
+        int c[]={ 7,  9};
+        int b[]={ 6, 35, 10};
+
+        float a[rowSize][colSize] = {{  1 , 1},
+                                     {  5 , 9},{3,7}};
+
+
+        for(int i=0 ; i<rowSize ; i++)
+            for(int j=0 ; j<colSize ; j++)
+                A[i][j]=a[i][j];
+
+        for(int i=0 ; i<colSize ; i++)
+            C[i] = c[i];
+
+        for(int j=0 ; j<rowSize ; j++)
+            B[j] = b[j];
+
+        BranchandBound BB = BranchandBound(A, B, C, cc, P);
+        BB.CalculBranchAndBound(A, B, C, cc, P);
+        BB.print();
+
+        QMessageBox *msg = new QMessageBox();
+        msg->information(this,"Branch and Bound","Please note that the Branch and Bound Program is not fully implemented into the GUI. The values can be hard coded and an output will be displayed in the application output panel. The program will close now.");
+
+
+        close();
+
+
+
+
+
+
+    });
+
+
     connect(buttonClose, &QPushButton::clicked, this, [=]() {
-       close();
+        close();
 
     });
 
@@ -357,7 +420,7 @@ void MainWindow::CreateSimTable(const int &startPosition_Y)
         for (int i = 0; i < basis.size(); ++i)
 
             simplexTable->setVerticalHeaderItem(i, new QTableWidgetItem(QString::number(basis[i].first) + " " + basis[i].second));
-            simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
+        simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
 
         for (int i = 0; i < unbasis.size(); ++i)
 

@@ -1,5 +1,6 @@
 #include "branchandbound.h"
-
+#include <QDebug>
+using namespace std;
 BranchandBound::BranchandBound(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string P){
     SolInteger.resize( a[0].size() , 0);
     PL = SimplexBB(a,b,c,ing,P);
@@ -80,19 +81,19 @@ void BranchandBound::CalculBranchAndBound(vector<vector<float> > a, vector<float
 
 void BranchandBound::print(){
 
-    cout<<"\n\n_____Resolution Branch and Bound_____\n"<<endl;
+    qDebug()<<"\n\n_____Resolution Branch and Bound_____\n"<<endl;
     for(int j=0 ; j<A.size() ; j++){
         for(int i=0 ; i<A[0].size() ; i++)
             printf("    %4.2f",A[j][i]);
         cout<<"  "<<Inegalite[j];
         printf("       %4.2f\n",B[j]);
     }
-    cout<<""<<endl;
+    qDebug()<<""<<endl;
     for(int i=0 ; i<cols ; i++)
         printf("    %4.2f",C[i]);
-    cout<<"\n"<<endl;
+    qDebug()<<"\n"<<endl;
     for(int i=0; i<SolInteger.size() ; i++)
-        cout<<"x"<<i<<" = "<<SolInteger[i]<<endl;
-    cout<<"\nMax = "<<Max<<"\n\n"<<endl;
+        qDebug()<<"x"<<i<<" = "<<SolInteger[i]<<endl;
+    qDebug()<<"\nMax = "<<Max<<"\n\n"<<endl;
 
 }

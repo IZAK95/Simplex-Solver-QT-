@@ -97,7 +97,9 @@ QString Simplex::getAnswer() const
 {
     switch (solveStatus) {
     case SolveResult::SOLVED:
-        return "The problem is solved. And the optimal solution is displayed.";
+        return "The problem is solved. And the optimal solution is displayed. Please note that the results are displayed in the Table Above.\n "
+               "If the user clicks on the last column, it will highlight the corresponding variable. \nPlease note that the answer is given in terms of S (Slack variable) and it will correspond"
+               "to an x value which can be determined by the user";
     case SolveResult::UNLIMITED:
         return "The function is not limited to the set of feasible solutions";
     case SolveResult::NO_SOLUTIONS:
@@ -114,7 +116,7 @@ QString Simplex::generateString() const
     auto getSign = [](const QString &source) {
         if (source[0] == '-')
             return " - " + source.right(source.length() - 1);
-       return " + " + source;
+        return " + " + source;
     };
     QString s;
     int uCounter = 0;
@@ -190,8 +192,8 @@ void Simplex::leadToCanonical(const QTableWidget *limitations, const QTableWidge
         for (int i = 0; i < originalFunction.size() - 1; ++i)
             canonicalFunction.push_back(originalFunction[i].toInt());
     }
-qDebug()<<"Original Fn "<<originalFunction<<endl;
-qDebug()<<"Canonical Fn "<<canonicalFunction<<endl;
+    qDebug()<<"Original Fn "<<originalFunction<<endl;
+    qDebug()<<"Canonical Fn "<<canonicalFunction<<endl;
 
     for (int i = 0; i < limitations->rowCount(); ++i) {
         originalLimitations.push_back(*new QVector<QString>);
@@ -203,10 +205,10 @@ qDebug()<<"Canonical Fn "<<canonicalFunction<<endl;
 
         qDebug()<<"Original Lim "<<originalLimitations<<endl;
 
-    //    qDebug()<<"Original Test "<<endl;
+        //    qDebug()<<"Original Test "<<endl;
     }
 
-//****************************************************************************************************************************************************************
+    //****************************************************************************************************************************************************************
 
     // Reduce to the canonical/standard form.
     for (int i = 0; i < limitations->rowCount(); ++i)
@@ -293,7 +295,7 @@ void Simplex::createMatrixCoeff()
                 }
                 return i;
             }
-        next:
+next:
             continue;
         }
         return -1;
@@ -335,8 +337,8 @@ void Simplex::fillMatrixByBasisAndUnbasis()
         matrix.push_back(*new QVector<Fraction>());
 
     for (int i = 0; i < matrixCoefficients[0].size(); ++i) {
-        if (isBasisColumn(i)) {  // If the i-th column of the coefficient matrix is ​​basic,
-            basis.push_back(allVariables[i]); // then add it to the basis.
+        if (isBasisColumn(i)) {                             // If the i-th column of the coefficient matrix is ​​basic,
+            basis.push_back(allVariables[i]);               // then add it to the basis.
         }
         else {
             // otherwise, it is considered to be a non-base column.
@@ -454,7 +456,7 @@ void Simplex::deleteColumn()
                 matrix[j].erase(matrix[j].begin() + i);
 
             unbasis.erase(unbasis.begin() + i);
-             --i;
+            --i;
         }
     }
     qDebug()<<"Delete Column"<<endl;
