@@ -123,7 +123,8 @@ QString Simplex::generateString() const
         s += getSign(QString::number(canonicalFunction[i])) + "x<sub>" + QString::number(i + 1) + "</sub>";
 
     s += " —> max<br>";
-    for (int i = 0; i < canonicalLimitations.size(); ++i) {
+    for (int i = 0; i < canonicalLimitations.size(); ++i)
+    {
         s += QString::number(canonicalLimitations[i][0]) + "x<sub>1</sub>";
         for (int j = 1; j < canonicalLimitations[0].size() - 1; ++j)
             s += getSign(QString::number(canonicalLimitations[i][j])) + "x<sub>" + QString::number(j + 1) + "</sub>";
@@ -134,6 +135,9 @@ QString Simplex::generateString() const
             else s += " - S<sb>" + QString::number(++uCounter) + "</sub>";
         }
         s += " = " + QString::number(canonicalLimitations[i][canonicalLimitations[0].size() - 1]) + "<br>";
+        qDebug()<<"Canonical Lims"<<canonicalLimitations[i]<<endl;
+        canonicalLimitations[i].value(1);
+
     }
     return s;
 }
@@ -186,7 +190,8 @@ void Simplex::leadToCanonical(const QTableWidget *limitations, const QTableWidge
         for (int i = 0; i < originalFunction.size() - 1; ++i)
             canonicalFunction.push_back(originalFunction[i].toInt());
     }
-
+qDebug()<<"Original Fn "<<originalFunction<<endl;
+qDebug()<<"Canonical Fn "<<canonicalFunction<<endl;
 
     for (int i = 0; i < limitations->rowCount(); ++i) {
         originalLimitations.push_back(*new QVector<QString>);
@@ -195,6 +200,10 @@ void Simplex::leadToCanonical(const QTableWidget *limitations, const QTableWidge
 
         originalLimitations[i].push_back(qobject_cast<QComboBox*>(limitations->cellWidget(i, limitations->columnCount() - 2))->currentText());
         originalLimitations[i].push_back(limitations->item(i, limitations->columnCount() - 1)->text());
+
+        qDebug()<<"Original Lim "<<originalLimitations<<endl;
+
+    //    qDebug()<<"Original Test "<<endl;
     }
 
 //****************************************************************************************************************************************************************

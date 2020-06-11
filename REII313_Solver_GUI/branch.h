@@ -15,7 +15,7 @@ public:
 
     int Max ;
     vector<float> SolInteger;
-//    SimplexBB PL ;//= new Simplex();
+    //    SimplexBB PL ;//= new Simplex();
 
     vector <vector<float>> A;
     vector <float> B;
@@ -24,15 +24,15 @@ public:
 
     string problem;
 
-        Branch(vector <vector<float>>a, vector <float>b, vector <float>c, vector<string> ing, string P);
+    Branch(vector <vector<float>>a, vector <float>b, vector <float>c, vector<string> ing, string P);
 
 
-   bool ChekIntegerSolution(vector<float>S);
+    bool ChekIntegerSolution(vector<float>S);
 
-   void CalculBranchAndBound(vector <vector<float>>a, vector <float>b, vector <float>c, vector<string> ing, string p);
+    void CalculBranchAndBound(vector <vector<float>>a, vector <float>b, vector <float>c, vector<string> ing, string p);
 
 
-   void print();
+    void print();
 };
 
 #endif // BRANCH_H

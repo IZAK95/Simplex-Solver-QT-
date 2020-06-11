@@ -18,6 +18,8 @@ class Simplex
     QVector<QVector<QString>> originalLimitations;
     QVector<int> canonicalFunction;
     QVector<QVector<int>> canonicalLimitations;
+    QVector<int> testVector;
+
     QVector<QVector<Fraction>> matrix;
     QVector<QPair<int, QString>> basis;
     QVector<QPair<int, QString>> unbasis;

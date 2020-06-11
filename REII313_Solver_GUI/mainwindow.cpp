@@ -11,9 +11,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle("REII313 Practical");
+
+
+
     Setup();
 
+    setWindowTitle("REII313 Practical");
+
+    setStyleSheet("background-image: ./Math.jpg");
     qDebug()<<"Init Main Window"<<endl;
 }
 //*********************************************************************************************************************************************************************
@@ -69,9 +74,11 @@ void MainWindow::Setup()
     spinColumnsCount->setRange(2, 20);
     layout->addWidget(spinColumnsCount, 3, 1);
 
+    //Add next button
     QPushButton *buttonContinue = new QPushButton("Next", this);
     buttonContinue->setMinimumSize(button_minX,button_minY);
     buttonContinue->setMaximumSize(button_maxX,button_maxY);
+    //buttonContinue->setDisabled(true);
     layout->addWidget(buttonContinue,4,1);
 
     widget->move(170, 0);
@@ -131,11 +138,13 @@ void MainWindow::GetVal(const int &rows, const int &columns)
         fn->setHorizontalHeaderItem(columns, new QTableWidgetItem("Min/Max"));
         layout->addWidget(fn, 1, 0);
 
+
         //Add Next Button
         QPushButton *buttonContinue = new QPushButton("Solve", this);
         buttonContinue->setMinimumSize(button_minX,button_minY);
         buttonContinue->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonContinue, 3, 0);
+
         //Add Back Button
         QPushButton *buttonBack = new QPushButton("Back", this);
         buttonBack->setMinimumSize(button_minX,button_minY);
@@ -167,6 +176,8 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
             simplex = new Simplex();
             simplex->initialize(lim, fn);
+           // qDebug()<<"Lim "<<lim<<endl;
+           // qDebug()<<"Fn "<<fn<<endl;
             MainWindow::ShowCanonLimAndMatrixCoeff();
 
 
@@ -229,6 +240,25 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
+
+
+    //Add Close Button
+    QPushButton *buttonClose = new QPushButton("Close", this);
+    buttonClose->setMinimumSize(button_minX,button_minY);
+    buttonClose->setMaximumSize(button_maxX,button_maxY);
+    layout->addWidget(buttonClose, 0, 0);
+
+    //Add Branch and Bound Button
+    QPushButton *branch = new QPushButton("Branch", this);
+    branch->setMinimumSize(button_minX,button_minY);
+    branch->setMaximumSize(button_maxX,button_maxY);
+    layout->addWidget(branch, 2, 0);
+
+    connect(buttonClose, &QPushButton::clicked, this, [=]() {
+       close();
+
+    });
+
     QTextEdit *textEdit = new QTextEdit(this);
 
     textEdit->setReadOnly(true);
@@ -250,7 +280,6 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
             tableCoefficients->setItem(i, j, new QTableWidgetItem(QString::number(matrixCoefficients[i][j])));
     for (int i = 0; i < allVariables.size(); ++i)
         tableCoefficients->setHorizontalHeaderItem(i, new QTableWidgetItem(allVariables[i].second));
-
     QScrollArea *area = new QScrollArea();
     area->setFrameShape(QFrame::NoFrame);
     area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -258,10 +287,12 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     area->setFixedSize(QGuiApplication::primaryScreen()->size().width() - textEdit->width() - textEdit->pos().x() - 20, tableCoefficients->height() + 20);
     layout->addWidget(area);
     textEdit->setFixedSize(35 * fn->columnCount() * 2, area->height()  );
+
     widget->adjustSize();
     widget->move(minimum_X, minimum_Y);
     widget->show();
     CreateSimTable(minimum_Y + widget->height());
+
 }
 
 void MainWindow::CreateSimTable(const int &startPosition_Y)
