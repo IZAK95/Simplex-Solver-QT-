@@ -16,14 +16,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    branch.cpp \
     main.cpp \
     mainwindow.cpp \
-    simplex.cpp
+    simplex.cpp \
+    simplexbb.cpp
 
 HEADERS += \
+    branch.h \
     fraction.h \
     mainwindow.h \
-    simplex.h
+    simplex.h \
+    simplexbb.h
 
 FORMS += \
     mainwindow.ui

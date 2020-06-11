@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include "simplex.h"
-
+#include "branch.h"
+#include "simplexbb.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -13,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("REII313 Practical");
     Setup();
 
-    qDebug()<<"Setup Complete, init Main Window"<<endl;
+    qDebug()<<"Init Main Window"<<endl;
 }
 //*********************************************************************************************************************************************************************
 MainWindow::~MainWindow()
@@ -104,8 +105,8 @@ void MainWindow::GetVal(const int &rows, const int &columns)
     //Add operators
     for (int i = 0; i < rows; ++i) {
         QComboBox *combo = new QComboBox(this);
-        combo->addItem(" ≥ ");
         combo->addItem(" ≤ ");
+        combo->addItem(" ≥ ");
         combo->addItem(" = ");
         lim->setCellWidget(i, columns, combo);
 
@@ -192,6 +193,7 @@ void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &co
 }
 
 //*********************************************************************************************************************************************************************
+//Checks for invalid inputs
 bool MainWindow::Check(const QTableWidget *lim, const QTableWidget *fn) const
 {
     QRegExp check("-?\\d{1,6}");
@@ -287,18 +289,23 @@ void MainWindow::CreateSimTable(const int &startPosition_Y)
         TableWidget(simplexTable, matrix.size(), matrix[0].size());
         simplexTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
         for (int i = 0; i < simplexTable->rowCount(); ++i)
+        {
             for (int j = 0; j < simplexTable->columnCount(); ++j)
             {
                 simplexTable->setItem(i, j, new QTableWidgetItem(matrix[i][j].getFraction()));
                 //See values entered into table
                 qDebug()<<matrix[i][j].getFraction()<<endl;
             }
-
+        }
         for (int i = 0; i < basis.size(); ++i)
+
             simplexTable->setVerticalHeaderItem(i, new QTableWidgetItem(QString::number(basis[i].first) + " " + basis[i].second));
-        simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
+            simplexTable->setVerticalHeaderItem(simplexTable->rowCount() - 1, new QTableWidgetItem(""));
+
         for (int i = 0; i < unbasis.size(); ++i)
+
             simplexTable->setHorizontalHeaderItem(i, new QTableWidgetItem(QString::number(unbasis[i].first) + "\n" + unbasis[i].second));
+
         if (simplex->getCurrentGuidingRow() != -1 && simplex->getCurrentGuidingColumn() != -1)
             simplexTable->item(simplex->getCurrentGuidingRow(), simplex->getCurrentGuidingColumn())->setBackground(QColor(0x46FF00));
 

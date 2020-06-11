@@ -1,6 +1,9 @@
-#include "Simplex.h"
+#include "simplex.h"
 ///Public------------------------------------------------------------------------------------------------------------------------------------
-Simplex::Simplex() {}
+Simplex::Simplex()
+{
+
+}
 
 // initialization function. It is this method that calls the functions of creating a matrix of coefficients, etc
 void Simplex::initialize(const QTableWidget *limitations, const QTableWidget *function)
@@ -33,8 +36,12 @@ Simplex::SolveResult Simplex::createNextSimplexMatrix()
     prepare();
     return Simplex::SolveResult::UNSOLVED;
 }
-
-Simplex::SolveResult Simplex::getCurrentSolveStatus() const { return solveStatus; }
+//*********************************************************************************************************************************************************************
+Simplex::SolveResult Simplex::getCurrentSolveStatus() const
+{
+    return solveStatus;
+}
+//*********************************************************************************************************************************************************************
 QVector<QPair<int, QString>> Simplex::getBasis() const
 {
     if (artificialBasis || shouldRemoveColumns) {
@@ -47,6 +54,7 @@ QVector<QPair<int, QString>> Simplex::getBasis() const
     }
     return basis;
 }
+//*********************************************************************************************************************************************************************
 QVector<QPair<int, QString>> Simplex::getUnbasis() const
 {
     if (artificialBasis || shouldRemoveColumns) {
@@ -59,18 +67,39 @@ QVector<QPair<int, QString>> Simplex::getUnbasis() const
     }
     return  unbasis;
 }
-QVector<QVector<int>> Simplex::getMatrixCoefficients() const { return matrixCoefficients; }
-QVector<QPair<int, QString>> Simplex::getAllVars() const { return allVariables; }
-QVector<QVector<Fraction>> Simplex::getMatrix() const { return matrix; }
-int Simplex::getCurrentGuidingRow() const { return guidingRow; }
-int Simplex::getCurrentGuidingColumn() const { return guiding_column; }
+//*********************************************************************************************************************************************************************
+QVector<QVector<int>> Simplex::getMatrixCoefficients() const
+{
+    return matrixCoefficients;
+}
+//*********************************************************************************************************************************************************************
+QVector<QPair<int, QString>> Simplex::getAllVars() const
+{
+    return allVariables;
+}
+//*********************************************************************************************************************************************************************
+QVector<QVector<Fraction>> Simplex::getMatrix() const
+{
+    return matrix;
+}
+//*********************************************************************************************************************************************************************
+int Simplex::getCurrentGuidingRow() const
+{
+    return guidingRow;
+}
+//*********************************************************************************************************************************************************************
+int Simplex::getCurrentGuidingColumn() const
+{
+    return guiding_column;
+}
+//*********************************************************************************************************************************************************************
 QString Simplex::getAnswer() const
 {
     switch (solveStatus) {
     case SolveResult::SOLVED:
         return "The problem is solved. And the optimal solution is displayed.";
     case SolveResult::UNLIMITED:
-        return "The function is not limited to the set of feasible solutions; it is impossible to find the optimal plan.";
+        return "The function is not limited to the set of feasible solutions";
     case SolveResult::NO_SOLUTIONS:
         return " The value of the function is positive and there are artificial variables in the basis.\n"
                "The original problem is unsolvable "
@@ -79,6 +108,7 @@ QString Simplex::getAnswer() const
         return "The problem is not solved";
     }
 }
+//*********************************************************************************************************************************************************************
 QString Simplex::generateString() const
 {
     auto getSign = [](const QString &source) {
@@ -100,14 +130,14 @@ QString Simplex::generateString() const
 
         if (u_variables[i] != 0) {
             if (u_variables[i] == 1)
-                s += " + u<sub>" + QString::number(++uCounter) + "</sub>";
-            else s += " - u<sub>" + QString::number(++uCounter) + "</sub>";
+                s += " + S<sub>" + QString::number(++uCounter) + "</sub>";
+            else s += " - S<sb>" + QString::number(++uCounter) + "</sub>";
         }
         s += " = " + QString::number(canonicalLimitations[i][canonicalLimitations[0].size() - 1]) + "<br>";
     }
     return s;
 }
-
+//*********************************************************************************************************************************************************************
 /// Private------------------------------------------------------------------------------------------------------------------------------------
 
 //Initializng the simplex table,running checks and searching referance rows and columns.
@@ -240,7 +270,7 @@ void Simplex::createMatrixCoeff()
             for (int j = 0; j < matrixCoefficients.size(); ++j)
                 matrixCoefficients[j].push_back(0);
             matrixCoefficients[i][matrixCoefficients[0].size() - 1] = u_variables[i];
-            allVariables.push_back(qMakePair(0, "u" + QString::number(uVarCount++)));
+            allVariables.push_back(qMakePair(0, "S" + QString::number(uVarCount++)));
         }
     }
 
@@ -402,6 +432,7 @@ bool Simplex::isExtraProblem() const
     if (!isOneFound || matrix[matrix.size() - 1][matrix[0].size() - 1] != 0)
         return false;
     return true;
+    qDebug()<<"Slack Variables Removed"<<endl;
 }
 //****************************************************************************************************************************************************************
 
