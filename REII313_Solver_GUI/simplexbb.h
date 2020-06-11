@@ -1,12 +1,18 @@
 #ifndef SIMPLEXBB_H
 #define SIMPLEXBB_H
-#include <iostream>
-#include <vector>
-#include <bits/stdc++.h>
 using namespace std;
+#include <iostream>
+#include "vector"
+#include <bits/stdc++.h>
+
 class SimplexBB
 {
-public :
+
+
+
+public:
+    SimplexBB();
+
     int rows;
     int cols;
 
@@ -29,16 +35,29 @@ public :
     float ObjW ;
 
     SimplexBB(vector <vector<float>>a, vector <float>b, vector <float>c, vector<string> ing, string P);
+
     void Solve();
-    void StandardForm();
+
+    void StandarForme();
+
     bool PhaseOne();
+
     void PivotageSimplex();
-    bool CheckOptimalSimplex(vector <float> T);
+
+    bool ChekOptimalSimplex(vector <float> T);
+
+
+
     int* GetPivot(vector <float> G);
+
     int IndexMinPositive(vector <float> V);
+
     int IndexMinPositiveStrinct(vector <float> V);
+
     void print();
+
     void printff();
+
     void printtff();
 };
 

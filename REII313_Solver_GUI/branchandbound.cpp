@@ -1,14 +1,12 @@
-#include "branch.h"
-#include "simplexbb.h"
+#include "branchandbound.h"
 
-Branch::Branch(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string P){
+BranchandBound::BranchandBound(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string P){
     SolInteger.resize( a[0].size() , 0);
-    SimplexBB *PL = new SimplexBB(a,b,c,ing,P);
-    //PL = SimplexBB(a,b,c,ing,P);
-    PL->Solve();
+    PL = SimplexBB(a,b,c,ing,P);
+    PL.Solve();
 
-    for(int i=0 ; i<PL->Solution.size() ; i++)
-        SolInteger[i] = PL->Solution[i];
+    for(int i=0 ; i<PL.Solution.size() ; i++)
+        SolInteger[i] = PL.Solution[i];
     Max=0;
 
 
@@ -34,45 +32,45 @@ Branch::Branch(vector<vector<float> > a, vector<float> b, vector<float> c, vecto
     }
 }
 
-bool Branch::ChekIntegerSolution(vector<float> S){
+bool BranchandBound::ChekIntegerSolution(vector<float> S){
     for(int i=0 ; i<S.size() ; i++)
         if(S[i] != floor(S[i]))
             return false;
     return true;
 }
 
-void Branch::CalculBranchAndBound(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string p){
+void BranchandBound::CalculBranchAndBound(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string p){
 
 
-    SimplexBB *PL = new SimplexBB(a,b,c,ing,p);
-    PL->Solve();
+    PL = SimplexBB(a,b,c,ing,p);
+    PL.Solve();
 
-    if(PL->realisable == true){
+    if(PL.realisable == true){
 
-        if(ChekIntegerSolution(PL->Solution)){
-            if(Max < PL->ObjectifFunction){
-                Max = PL->ObjectifFunction;
-                for(int i=0 ; i<PL->Solution.size() ; i++)
-                    SolInteger[i] = PL->Solution[i];
+        if(ChekIntegerSolution(PL.Solution)){
+            if(Max < PL.ObjectifFunction){
+                Max = PL.ObjectifFunction;
+                for(int i=0 ; i<PL.Solution.size() ; i++)
+                    SolInteger[i] = PL.Solution[i];
             }
         }
         else{
             int i=0;
 
-            while( i<PL->Solution.size() && PL->Solution[i] == floor(PL->Solution[i]))
+            while( i<PL.Solution.size() && PL.Solution[i] == floor(PL.Solution[i]))
                 i++;
 
             ing.resize( ing.size()+1,"<=");
-            b.resize( b.size()+1 , floor(PL->Solution[i]));
+            b.resize( b.size()+1 , floor(PL.Solution[i]));
 
             a.resize( a.size()+1 ,vector<float>(a[0].size(),0));
             a[a.size()-1][i] = 1;
-            PL->printff();
+            PL.printff();
             CalculBranchAndBound(a,b,c,ing,p);
 
             ing[ing.size()-1] = ">=";
             b[b.size()-1] += 1;
-            PL->printff();
+            PL.printff();
             CalculBranchAndBound(a,b,c,ing,p);
         }
         print();
@@ -80,7 +78,7 @@ void Branch::CalculBranchAndBound(vector<vector<float> > a, vector<float> b, vec
     print();
 }
 
-void Branch::print(){
+void BranchandBound::print(){
 
     cout<<"\n\n_____Resolution Branch and Bound_____\n"<<endl;
     for(int j=0 ; j<A.size() ; j++){

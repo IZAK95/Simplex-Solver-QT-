@@ -28,10 +28,10 @@ const int minimum_Y = 0;
 const int minimum_X = 0;
 
 //These values determine the size of the Table Rows and Columns
-const int tableColumnWidth = 80;
-const int tableRowHeight = 40;
+const int tableColumnWidth = 100;
+const int tableRowHeight = 50;
 
-const int QTextEditRowHeight = 26;
+const int QTextEditRowHeight = 30;
 const int buttonWidth = 150;
 const int buttonHeight = 30;
 

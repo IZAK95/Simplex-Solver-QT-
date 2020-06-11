@@ -2,8 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include "simplex.h"
-#include "branch.h"
-#include "simplexbb.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -17,8 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     Setup();
 
     setWindowTitle("REII313 Practical");
-
-    setStyleSheet("background-image: ./Math.jpg");
+    setStyleSheet("background-color: light blue");
+    //setStyleSheet("background-image: ./Math.jpg");
     qDebug()<<"Init Main Window"<<endl;
 }
 //*********************************************************************************************************************************************************************
@@ -31,8 +29,9 @@ MainWindow::~MainWindow()
 void MainWindow::Setup()
 {
      //Define Fonts Used
-     QFont DefaultFont("Times",15);
-     QFont TitleFont("Times", 35, QFont::Bold);
+     QFont DefaultFont("Algerian",12);
+     QFont TitleFont("Algerian", 45, QFont::Bold);
+     QFont TextFont("Castellar", 10);
 
      //Set BackGround Colours
 
@@ -50,34 +49,40 @@ void MainWindow::Setup()
     labelTitle->setMinimumHeight(100);
     labelTitle->setFont(TitleFont);
     layout->addWidget(labelTitle,0,0);
-
+    labelTitle->setAlignment(Qt::AlignCenter);
     //Insert Description
     QLabel *labelDescription = new QLabel();
     labelDescription->setFont(DefaultFont);
     labelDescription->setText("Done by Izak Adendorff (30934672) and Izelle Evert (30238072)");
+    labelDescription->setAlignment(Qt::AlignCenter);
     layout->addWidget(labelDescription,1,0);
     layout->setVerticalSpacing(10);
 
     QLabel *labelRowsCount = new QLabel(" Number of limits (rows):", this);
+    labelRowsCount->setFont(TextFont);
     layout->addWidget(labelRowsCount, 2, 0);
 
     QSpinBox *spinRowsCount = new QSpinBox(this); // Number of lines (number of restrictions)
+    spinRowsCount->setFont(TextFont);
     spinRowsCount->setRange(2, 20);
-
     layout->addWidget(spinRowsCount, 2, 1);
 
     QLabel *labelColumnsCount = new QLabel("Number of variables (columns):", this);
+    labelColumnsCount->setFont(TextFont);
     layout->addWidget(labelColumnsCount, 3, 0);
 
     QSpinBox *spinColumnsCount = new QSpinBox(this);
     // Number of columns (number of variables)
     spinColumnsCount->setRange(2, 20);
+    spinColumnsCount->setFont(TextFont);
     layout->addWidget(spinColumnsCount, 3, 1);
+
 
     //Add next button
     QPushButton *buttonContinue = new QPushButton("Next", this);
     buttonContinue->setMinimumSize(button_minX,button_minY);
     buttonContinue->setMaximumSize(button_maxX,button_maxY);
+    buttonContinue->setFont(DefaultFont);
     //buttonContinue->setDisabled(true);
     layout->addWidget(buttonContinue,4,1);
 
@@ -102,16 +107,22 @@ void MainWindow::Setup()
 //*********************************************************************************************************************************************************************
 void MainWindow::GetVal(const int &rows, const int &columns)
 {
+    QFont DefaultFont("Algerian",12);
+    QFont TextFont("Castellar", 10);
+
     QWidget *widget = new QWidget(this);
     QGridLayout *layout = new QGridLayout(widget);
     layout->setSpacing(0);
     lim = new QTableWidget(this);
+    //lim->setFont(DefaultFont);
+
     // Constraint Matrix
     TableWidget(lim, rows, columns + 2);
 
     //Add operators
     for (int i = 0; i < rows; ++i) {
         QComboBox *combo = new QComboBox(this);
+        combo->setFont(DefaultFont);
         combo->addItem(" ≤ ");
         combo->addItem(" ≥ ");
         combo->addItem(" = ");
@@ -122,6 +133,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
         lim->setHorizontalHeaderItem(columns, new QTableWidgetItem("Sign"));
         lim->setHorizontalHeaderItem(columns + 1, new QTableWidgetItem("Equal"));
+
         layout->addWidget(lim, 0, 0);
         fn = new QTableWidget(this);
 
@@ -131,6 +143,7 @@ void MainWindow::GetVal(const int &rows, const int &columns)
         QComboBox *extr = new QComboBox(this);
         extr->addItem("max");
         extr->addItem("min");
+        extr->setFont(DefaultFont);
         fn->setCellWidget(0, columns, extr);
         for (int i = 0; i < columns; ++i)
             fn->setHorizontalHeaderItem(i, new QTableWidgetItem("x" + QString::number(i + 1)));
@@ -141,12 +154,14 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 
         //Add Next Button
         QPushButton *buttonContinue = new QPushButton("Solve", this);
+        buttonContinue->setFont(DefaultFont);
         buttonContinue->setMinimumSize(button_minX,button_minY);
         buttonContinue->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonContinue, 3, 0);
 
         //Add Back Button
         QPushButton *buttonBack = new QPushButton("Back", this);
+        buttonBack->setFont(DefaultFont);
         buttonBack->setMinimumSize(button_minX,button_minY);
         buttonBack->setMaximumSize(button_maxX,button_maxY);
         layout->addWidget(buttonBack, 2, 0);
@@ -190,13 +205,17 @@ void MainWindow::GetVal(const int &rows, const int &columns)
 //Create QTable with the values entered by the user
 void MainWindow::TableWidget(QTableWidget *table, const int &rows, const int &columns)
 {
+    QFont DefaultFont("Algerian",12);
+
     table->setRowCount(rows);
     table->setColumnCount(columns);
     for (int i = 0; i < columns; ++i)
     {
         table->setColumnWidth(i, tableColumnWidth);
     table->verticalHeader()->setFixedWidth(tableColumnWidth);
+    table->verticalHeader()->setFont(DefaultFont);
     table->horizontalHeader()->setFixedHeight(tableRowHeight + 5);
+    table->horizontalHeader()->setFont(DefaultFont);
     table->setFixedSize(table->horizontalHeader()->length() + table->verticalHeader()->width() + 2,
                         table->verticalHeader()->length() + table->horizontalHeader()->height() + 2);
     }
@@ -240,16 +259,20 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
+    QFont DefaultFont("Algerian",12);
+    QFont TextFont("Castellar", 10);
 
 
     //Add Close Button
     QPushButton *buttonClose = new QPushButton("Close", this);
+    buttonClose->setFont(DefaultFont);
     buttonClose->setMinimumSize(button_minX,button_minY);
     buttonClose->setMaximumSize(button_maxX,button_maxY);
     layout->addWidget(buttonClose, 0, 0);
 
     //Add Branch and Bound Button
     QPushButton *branch = new QPushButton("Branch", this);
+    branch->setFont(DefaultFont);
     branch->setMinimumSize(button_minX,button_minY);
     branch->setMaximumSize(button_maxX,button_maxY);
     layout->addWidget(branch, 2, 0);
@@ -260,10 +283,9 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     });
 
     QTextEdit *textEdit = new QTextEdit(this);
-
+    textEdit->setFont(DefaultFont);
     textEdit->setReadOnly(true);
     textEdit->setText(simplex->generateString());
-    textEdit->setFont(QFont("Calibri", 13));
 
     textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     const QVector<QPair<int, QString>> allVariables = simplex->getAllVars();
@@ -285,6 +307,7 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
     area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     area->setWidget(tableCoefficients);
     area->setFixedSize(QGuiApplication::primaryScreen()->size().width() - textEdit->width() - textEdit->pos().x() - 20, tableCoefficients->height() + 20);
+    area->setFont(DefaultFont);
     layout->addWidget(area);
     textEdit->setFixedSize(35 * fn->columnCount() * 2, area->height()  );
 
@@ -297,6 +320,9 @@ void MainWindow::ShowCanonLimAndMatrixCoeff()
 
 void MainWindow::CreateSimTable(const int &startPosition_Y)
 {
+    QFont DefaultFont("Algerian",12);
+    QFont TextFont("Castellar", 10);
+
     int Y = startPosition_Y;
     const int mheight = QGuiApplication::primaryScreen()->size().height();
     int iRow = 0;
@@ -357,9 +383,7 @@ void MainWindow::CreateSimTable(const int &startPosition_Y)
 
     QLabel *lblAnswer = new QLabel(simplex->getAnswer());
     lblAnswer->setStyleSheet("color: green;");
-    QFont font;
-    font.setPointSize(10);
-    lblAnswer->setFont(font);
+    lblAnswer->setFont(TextFont);
     groupBoxLayout->addWidget(lblAnswer);
 
     layout->addWidget(groupBox, --iRow, iColumn);

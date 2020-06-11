@@ -1,5 +1,9 @@
 #include "simplexbb.h"
 
+SimplexBB::SimplexBB()
+{
+
+}
 
 SimplexBB::SimplexBB(vector<vector<float> > a, vector<float> b, vector<float> c, vector<string> ing, string P){
 
@@ -36,7 +40,7 @@ SimplexBB::SimplexBB(vector<vector<float> > a, vector<float> b, vector<float> c,
     for(int i=0 ; i< rows ; i++ )
         Inegalite[i] = ing[i];
 
-    StandardForm();
+    StandarForme();
 }
 
 void SimplexBB::Solve(){
@@ -51,7 +55,7 @@ void SimplexBB::Solve(){
     else  PivotageSimplex();
 }
 
-void SimplexBB::StandardForm(){
+void SimplexBB::StandarForme(){
     BaseIndex.resize( rows );
 
     for(int i=0 ; i<rows ; i++)
@@ -95,7 +99,7 @@ bool SimplexBB::PhaseOne(){
         }
     }
 
-    while(!CheckOptimalSimplex(W)){
+    while(!ChekOptimalSimplex(W)){
         printff();
         int *Pivot = GetPivot(W);
 
@@ -158,7 +162,7 @@ bool SimplexBB::PhaseOne(){
 
 void SimplexBB::PivotageSimplex(){
 
-    while(!CheckOptimalSimplex(C)){
+    while(!ChekOptimalSimplex(C)){
         printtff();
         int *Pivot = GetPivot(C);
 
@@ -202,7 +206,7 @@ void SimplexBB::PivotageSimplex(){
 
 }
 
-bool SimplexBB::CheckOptimalSimplex(vector<float> T){
+bool SimplexBB::ChekOptimalSimplex(vector<float> T){
     for(int i=0 ; i<T.size() ; i++)
         if(T[i] > 0)
             return false;
